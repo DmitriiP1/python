@@ -1,14 +1,14 @@
-import os
 from random import randint
 import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--length', type=int, help='Длина генерируемой последовательности.',required=True)
-parser.add_argument('--model', help='Путь к файлу, в который сохраняется модель', required=True)
+parser.add_argument('--model', help='Путь к файлу, из которого загружается модель', required=True)
 namespace = parser.parse_args()
 
-def read():
-    with open(namespace.model) as file:
+#Открываем результаты обработки текстов, заносим эти данные в словарь
+def readinput():
+    with open(namespace.model, 'r') as file:
         dictionary_stat = {}
         for line in file:
             line = line.split()
@@ -38,7 +38,7 @@ def find_next_word(current_word, dictionary_stat):
 
 
 def generate(len_text):
-    dictionary_stat = read()
+    dictionary_stat = readinput()
     text = []
     start = randint(0, len(dictionary_stat))
     pos = 0
