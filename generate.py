@@ -66,7 +66,6 @@ def generate(len_text):
 text = []
 text = generate(namespace.length)
 if namespace.output != None:
-    #file = open('review.txt', 'w')
     file = open(namespace.output, 'w')
     for i in text:
         file.write(str(i) + ' ')
