@@ -4,6 +4,8 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--length', type=int, help='Длина генерируемой последовательности.',required=True)
 parser.add_argument('--model', help='Путь к файлу, из которого загружается модель', required=True)
+parser.add_argument('--seed', help='Начальное слово')
+parser.add_argument('--output', help='Файл, в который будет записан результат')
 namespace = parser.parse_args()
 
 #Открываем результаты обработки текстов, заносим эти данные в словарь
@@ -40,16 +42,19 @@ def find_next_word(current_word, dictionary_stat):
 def generate(len_text):
     dictionary_stat = readinput()
     text = []
-    start = randint(0, len(dictionary_stat))
-    pos = 0
-    word = ' '
-    for i in dictionary_stat:
-        if pos == start:
-            word = i.split()
-            word = word[0]
-            word = str(word)
-            break
-        pos += 1
+    if namespace.seed == None:
+        start = randint(0, len(dictionary_stat))
+        pos = 0
+        word = ' '
+        for i in dictionary_stat:
+            if pos == start:
+                word = i.split()
+                word = word[0]
+                word = str(word)
+                break
+            pos += 1
+    else:
+        word = namespace.seed
     for i in range(len_text):
         text.append(word)
         word = find_next_word(word, dictionary_stat)
@@ -57,10 +62,14 @@ def generate(len_text):
             return text
     return text
 
+
 text = []
 text = generate(namespace.length)
-print(' '.join(text))
-file = open('review.txt', 'w')
-for i in text:
-    file.write(str(i) + ' ')
-file.close()
+if namespace.output != None:
+    #file = open('review.txt', 'w')
+    file = open(namespace.output, 'w')
+    for i in text:
+        file.write(str(i) + ' ')
+    file.close()
+else:
+    print(' '.join(text))
