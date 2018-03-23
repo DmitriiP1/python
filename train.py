@@ -10,7 +10,7 @@ namespace = parser.parse_args()
 
 #Функция, обрабатывающая данный текст
 #На вход подается адрес файла с текстом
-def colibrate(fileread):
+def train(fileread):
     filewrite = open(namespace.model, 'tw', encoding='utf-8')#Файл для записи статистики
     fileread = open(fileread, 'r', encoding='utf-8')#Файл с текстом
     dictionary_stat = {}#Словарь, хранящий статистику
@@ -34,4 +34,4 @@ for i in files:#рассматриваем каждый файл в директ
     if file_extension == '.txt':#если тхт, то обрабатываем его
         temp = str(os.getcwd() + '/texts/' + str(i))#обрабатываемый файл
         #print(temp)#выводим название обработываемого файла
-        colibrate(temp)
+        train(temp)
