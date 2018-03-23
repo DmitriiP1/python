@@ -21,7 +21,7 @@
 ### Обычный запрос:
     python3 train.py --input-dir /Users/dmitrijpavlov/Desktop/Review/texts --model /Users/dmitrijpavlov/Desktop/Review/write.txt
 
-### Запрос с преыедением всех слов к lowercase
+### Запрос с привдением всех слов к lowercase
     python3 train.py --input-dir /Users/dmitrijpavlov/Desktop/Review/texts --lc --model /Users/dmitrijpavlov/Desktop/Review/write.txt
 
 
