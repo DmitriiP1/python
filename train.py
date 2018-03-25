@@ -1,3 +1,4 @@
+# coding: utf-8
 import re
 import os
 import argparse
@@ -28,10 +29,16 @@ def train(fileread):
     fileread.close()
     filewrite.close()
 
-files = os.listdir(namespace.dir)#список файлов в полученой директории
-for i in files:#рассматриваем каждый файл в директории
-    filename, file_extension = os.path.splitext(i)#разделяем имя файла на 2 части: заголовок и формат
+def view_folder(path):
+    if os.path.isdir(path):#если файл - папка
+        link = os.path.normpath(path)
+        files = os.listdir(path)
+        for i in files:  # рассматриваем каждый файл в директории
+            view_folder(link + '/' + str(i))#открываем папку в текущей директории
+
+    filename, file_extension = os.path.splitext(path)#разделяем имя файла на 2 части: заголовок и формат
     if file_extension == '.txt':#если тхт, то обрабатываем его
-        temp = str(os.getcwd() + '/texts/' + str(i))#обрабатываемый файл
-        #print(temp)#выводим название обработываемого файла
+        temp = str(os.path.normpath(path))#обрабатываемый файл
         train(temp)
+
+view_folder(namespace.dir)#список файлов в полученой директории
