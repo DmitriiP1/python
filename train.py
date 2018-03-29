@@ -22,6 +22,9 @@ parser.add_argument('--lc',
 
 namespace = parser.parse_args()
 
+# Словарь, хранящий статистику
+dictionary_stat = {}
+
 
 # Функция, обрабатывающая данный текст
 # На вход подается адрес файла с текстом
@@ -31,8 +34,6 @@ def train(fileread):
     # Файл с текстом
     fileread = open(fileread, 'r', encoding='utf-8')
 
-    # Словарь, хранящий статистику
-    dictionary_stat = {}
     # Достаем часть текста
     for line in fileread:
         # Разрешенные символы
@@ -62,26 +63,21 @@ def train(fileread):
     filewrite.close()
 
 
-def view_folder(path):
-    # если файл - папка
-    if os.path.isdir(path):
-        # Путь к текущей директории
-        link = os.path.normpath(path)
-        # Список фалов в текущей директории
-        files = os.listdir(path)
-
-        # Рассматриваем каждый файл в директории
+# Поиск .txt файлов в директории
+def find_txt_files(dir):
+    # Поиск файлов в директории
+    for top, dirs, files in os.walk(dir):
         for i in files:
-            # открываем папку в текущей директории
-            view_folder(link + '/' + str(i))
+            # Путь к файлу
+            path = str(os.path.join(top, i))
 
-    # Разделяем имя файла на 2 части: заголовок и формат
-    filename, file_extension = os.path.splitext(path)
-    # Если .тхт, то обрабатываем его
-    if file_extension == '.txt':
-        # Обрабатываемый файл
-        file = str(os.path.normpath(path))
-        train(file)
+            # Разделяем имя файла на 2 части: заголовок и формат
+            filename, file_extension = os.path.splitext(path)
+            # Если .тхт, то обрабатываем его
+            if file_extension == '.txt':
+                # Обрабатываемый файл
+                file = str(os.path.normpath(path))
+                train(file)
 
 
-view_folder(namespace.dir)
+find_txt_files(namespace.dir)
