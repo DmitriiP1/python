@@ -22,6 +22,9 @@ parser.add_argument('--lc',
 
 namespace = parser.parse_args()
 
+# Файл для записи статистики
+filewrite = open(namespace.model, 'tw', encoding='utf-8')
+
 # Словарь, хранящий статистику
 dictionary_stat = {}
 
@@ -29,8 +32,6 @@ dictionary_stat = {}
 # Функция, обрабатывающая данный текст
 # На вход подается адрес файла с текстом
 def train(fileread):
-    # Файл для записи статистики
-    filewrite = open(namespace.model, 'tw', encoding='utf-8')
     # Файл с текстом
     fileread = open(fileread, 'r', encoding='utf-8')
 
@@ -60,7 +61,6 @@ def train(fileread):
 
     # Закырваем файлы
     fileread.close()
-    filewrite.close()
 
 
 # Поиск .txt файлов в директории
@@ -81,3 +81,4 @@ def find_txt_files(dir):
 
 
 find_txt_files(namespace.dir)
+filewrite.close()

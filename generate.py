@@ -22,26 +22,24 @@ parser.add_argument('--output',
 
 namespace = parser.parse_args()
 
+# Словарь со статистикой
+dictionary_stat = {}
 
 # Открываем результаты обработки текстов,
 # Заносим эти данные в словарь
-def readinput():
-    # Дальше работаем с файлом путь к которому задана в model
-    with open(namespace.model, 'r') as file:
-        dictionary_stat = {}  # словарь со статистикой словосочетаний
-        # Обработка файла,
-        # В цикле будем доставать строчки из файла и доавлять их в словарь
-        for line in file:
-            line = line.split()
+# Дальше работаем с файлом путь к которому задана в model
+with open(namespace.model, 'r') as file:
+    # Обработка файла,
+    # В цикле будем доставать строчки из файла и доавлять их в словарь
+    for line in file:
+        line = line.split()
 
-            # Строки в файле имеют вид: <слово1>' '<слово2> : статистика
-            line_str = str(str(line[0]) + ' ' + str(line[1]))
-            # Статистика словосочетания - слово после второго пробела
-            dictionary_stat.update({line_str: line[2]})
-        # Закрываем файл model
-        file.close()
-        # Словарь со статистикой
-        return dictionary_stat
+        # Строки в файле имеют вид: <слово1>' '<слово2> : статистика
+        line_str = str(str(line[0]) + ' ' + str(line[1]))
+        # Статистика словосочетания - слово после второго пробела
+        dictionary_stat.update({line_str: line[2]})
+    # Закрываем файл model
+    file.close()
 
 
 # Функция выдает слово, которое наиболее подходит для данного
@@ -86,9 +84,6 @@ def find_next_word(current_word, dictionary_stat):
 # На вход подается число слов в генерируемом тексте
 # Выдает список слов в порядке, в котором они должны стоять в тексте
 def generate(len_text):
-    # Считываем результаты тренировки
-    dictionary_stat = readinput()
-
     # Список для текста, который выдаст функция
     text = []
 
@@ -109,16 +104,27 @@ def generate(len_text):
             step += 1
     # Если первоначальное слово задано, то строим текст начиная с него
     else:
-        word = namespace.seed
-
+        flag = False
+        # Ищем есть ли seed среди ключей в словаре
+        for key in dictionary_stat:
+            temp = key.split()
+            if temp[0] == namespace.seed:
+                # Нашли
+                flag = True
+        if flag:
+            word = namespace.seed
+        else:
+            # Если не нашли то исключение
+            raise SystemError(256)
     # В цикле для i-го слова буем искать i + 1 при помощи полученой статистики
-    for i in range(len_text):
-        text.append(word)
-        # Определяем подходящее слово
-        word = find_next_word(word, dictionary_stat)
-        # Если подходящего слова нет, значит алгоритм зашел в тупик
-        if word == 'WRONG':
-            return text
+    if word != '':
+        for i in range(len_text):
+            text.append(word)
+            # Определяем подходящее слово
+            word = find_next_word(word, dictionary_stat)
+            # Если подходящего слова нет, значит алгоритм зашел в тупик
+            if word == 'WRONG':
+                return text
     return text
 
 
