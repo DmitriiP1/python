@@ -55,6 +55,9 @@ def train(fileread):
             # Учитываем повторяющиеся словосочетания
             dictionary_stat[pair] = dictionary_stat[pair] + 1 \
                 if pair in dictionary_stat else 1
+        pair = tmp_line[len(tmp_line) - 1] + ' ' + '$'
+        dictionary_stat[pair] = dictionary_stat[pair] + 1 \
+            if pair in dictionary_stat else 1
 
     for key in dictionary_stat:  # Запись в файл полученной статистики
         filewrite.write(str(str(key) + ' ' + str(dictionary_stat[key]) + '\n'))

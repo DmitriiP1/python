@@ -80,51 +80,55 @@ def find_next_word(current_word, dictionary_stat):
         random_int = random_int - int(dictionary_stat[collocation])
 
 
+def random_word():
+    # Seed для слова
+    start = randint(0, len(dictionary_stat))
+    step = 0
+    # Первое слово
+    word = ' '
+    # Берем элементы из списка, столько, сколько выдал рандом
+    for i in dictionary_stat:
+        if step == start:
+            word = i.split()
+            word = word[0]
+            word = str(word)
+            break
+        step += 1
+    return word
+
+
 # Функция, генерирующая текст
 # На вход подается число слов в генерируемом тексте
 # Выдает список слов в порядке, в котором они должны стоять в тексте
 def generate(len_text):
     # Список для текста, который выдаст функция
     text = []
-
+    word = ''
     # Если не задано первое слово, то выберем рандомное из списка
     if namespace.seed is None:
-        # Seed для слова
-        start = randint(0, len(dictionary_stat))
-        step = 0
-        # Первое слово
-        word = ' '
-        # Берем элементы из списка, столько, сколько выдал рандом
-        for i in dictionary_stat:
-            if step == start:
-                word = i.split()
-                word = word[0]
-                word = str(word)
-                break
-            step += 1
+        word = random_word()
     # Если первоначальное слово задано, то строим текст начиная с него
     else:
-        flag = False
+        # В словаре нет seed
+        flag = True
         # Ищем есть ли seed среди ключей в словаре
         for key in dictionary_stat:
             temp = key.split()
             if temp[0] == namespace.seed:
+                word = namespace.seed
                 # Нашли
-                flag = True
+                flag = False
         if flag:
-            word = namespace.seed
-        else:
             # Если не нашли то исключение
             raise SystemError(256)
     # В цикле для i-го слова буем искать i + 1 при помощи полученой статистики
-    if word != '':
-        for i in range(len_text):
-            text.append(word)
-            # Определяем подходящее слово
-            word = find_next_word(word, dictionary_stat)
-            # Если подходящего слова нет, значит алгоритм зашел в тупик
-            if word == 'WRONG':
-                return text
+    for i in range(len_text):
+        text.append(word)
+        # Определяем подходящее слово
+        word = find_next_word(word, dictionary_stat)
+        # Если подходящего слова нет, значит алгоритм зашел в тупик
+        if word == 'WRONG' or word == '$':
+            return text
     return text
 
 
