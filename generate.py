@@ -6,9 +6,11 @@
 # Версия №0.1.0
 
 import argparse
-import configparser
 import random
 import json
+
+# Глобальная константа
+PAIR_FOR_LAST_WORD = '$'
 
 # Командный интерфейс
 parser = argparse.ArgumentParser(description='Генератор текстов. Если модель '
@@ -87,7 +89,7 @@ def generate(len_text, seed, dictionary_stat):
         flag = True
         # Ищем есть ли seed среди ключей в словаре
         for key in dictionary_stat:
-            if key == seed:
+            if key[0] == seed:
                 word = seed
                 # Нашли
                 flag = False
@@ -101,7 +103,7 @@ def generate(len_text, seed, dictionary_stat):
         # Определяем подходящее слово
         word = find_next_word(word, dictionary_stat)
         # Если подходящего слова нет, значит алгоритм зашел в тупик
-        if word is None or word == pair_for_last_word:
+        if word is None or word == PAIR_FOR_LAST_WORD:
             return ' '.join(text)
     return ' '.join(text)
 
@@ -117,13 +119,6 @@ if __name__ == '__main__':
 
     for key in dictionary_tmp:
         dictionary_stat[tuple(key.split())] = dictionary_tmp[key]
-
-    # Чтение конфига
-    config = configparser.ConfigParser()
-    config.read('settings.ini')
-    # letter - символ, который будет показывать, что это слово было
-    # последним в тексте и для него нельзя выбрать пару.
-    pair_for_last_word = config['settings']['letter']
 
     # Генерируем текст
     text = generate(namespace.length, namespace.seed, dictionary_stat)

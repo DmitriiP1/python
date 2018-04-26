@@ -8,8 +8,10 @@
 import re
 import os
 import argparse
-import configparser
 import json
+
+# Глобальная константа
+PAIR_FOR_LAST_WORD = '$'
 
 # Командный интерфейс
 parser = argparse.ArgumentParser(description='Создание модели. Модель нужна '
@@ -83,7 +85,7 @@ def train(file_for_train, lowercase, dictionary_stat):
                 pair = line[i] + ' ' + line[i + 1]
                 add_pair(pair, dictionary_stat)
             if line:
-                pair = line[-1] + ' ' + pair_for_last_word
+                pair = line[-1] + ' ' + PAIR_FOR_LAST_WORD
                 add_pair(pair, dictionary_stat)
 
 
@@ -115,14 +117,6 @@ if __name__ == '__main__':
     # Словарь, хранящий статистику
     dictionary_stat = {}
 
-    # Чтение конфига
-    config = configparser.ConfigParser()
-    config.read('settings.ini')
-    # letter - символ, который будет показывать, что это слово было
-    # последним в тексте и для него нельзя выбрать пару.
-    pair_for_last_word = config['settings']['letter']
-
-    # Очистим файл для запсии новой модели
     open(namespace.model, 'w').close()
 
     # Файл для записи модели
