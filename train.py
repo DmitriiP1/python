@@ -3,12 +3,13 @@
 # Павлов Дмитрий
 # МФТИ 2018
 # Ревью №1
-# Версия №0.1.0
+# Версия №0.1.2
 
 import re
 import os
 import argparse
 import json
+from collections import Counter
 
 # Глобальная константа
 PAIR_FOR_LAST_WORD = '$'
@@ -39,27 +40,14 @@ parser.add_argument('--lc',
 namespace = parser.parse_args()
 
 
-def add_pair(pair, dictionary_stat):
-    # Добавляет пару в модель, учитывая повторения
-
-    # pair - добавляемая пара слов
-
-    # dictionary_stat - словарь с моделью
-    # ------------------------------------------ #
-
-    if dictionary_stat.setdefault(pair) is None:
-        dictionary_stat[pair] = 1
-    else:
-        dictionary_stat[pair] += 1
-
-
-def train(file_for_train, lowercase, dictionary_stat):
-    # Функция, создающая модель на основе данного текст
+def train(file_for_train, lowercase, bigrams, used):
+    # Функция, дополняющая модель по данным из текста
 
     # file_for_train - файл с текстом по которому будет обучаться программа
     # lowercase - переменная, отвечающая за приведение слов, сохраняемых
     # в модели, к нижнему регистру
-    # dictionary_stat - словарь с моделью
+    # bigrams - cписок пар
+    # used - список слов, которые есть в bigrams
     # ------------------------------------------------------------------- #
 
     # Файл с текстом
@@ -77,26 +65,37 @@ def train(file_for_train, lowercase, dictionary_stat):
                 line = line.lower()
 
             line = line.split()
-
             # Проходим по куску текста
             for i in range(len(line) - 1):
                 # 2 подряд идущие слова объединяем в словосочетание,
                 # записываем их в словарь
                 pair = line[i] + ' ' + line[i + 1]
-                add_pair(pair, dictionary_stat)
-            if line:
+                bigrams.append(pair)
+                used.append(line[i])
+            # Если слово последнее, но встречалось раньше, то не ставим ему
+            # в пару специальный символ, отвечающий за слова
+            # с непонятным продолжением
+            if line and line[-1] not in used:
                 pair = line[-1] + ' ' + PAIR_FOR_LAST_WORD
-                add_pair(pair, dictionary_stat)
+                bigrams.append(pair)
 
 
-def find_txt_files(directory, lowercase, dictionary_stat):
+def get_bigrams(directory, lowercase):
     # Поиск .txt файлов в директории
+    # Возвращает список пар слов
 
     # directory - директория с файлами для обучения
     # lowercase - переменная, отвечающая за приведение слов, сохраняемых
     # в модели, к нижнему регистру
-    # dictionary_stat - словарь с моделью
+    # bigrams - cписок пар
+
+    # Возвращает список, состоящий из строк "<слово 1>' '<слово 2>"
     # ---------------------------------------------------------------- #
+
+    # Список пар
+    bigrams = []
+    # Слова которые есть в bigrams
+    used = []
 
     # Поиск файлов в директории
     for top, dirs, files in os.walk(directory):
@@ -110,19 +109,19 @@ def find_txt_files(directory, lowercase, dictionary_stat):
             if file_extension == '.txt':
                 # Обрабатываемый файл
                 file = str(os.path.normpath(path))
-                train(file, lowercase, dictionary_stat)
+                train(file, lowercase, bigrams, used)
+    return bigrams
 
 
 if __name__ == '__main__':
-    # Словарь, хранящий статистику
-    dictionary_stat = {}
 
     open(namespace.model, 'w').close()
 
     # Файл для записи модели
-    with open(namespace.model, 'a+', encoding='utf-8') as model:
+    with open(namespace.model, 'a+', encoding='utf-8') as model_f:
 
-        find_txt_files(namespace.dir, namespace.lc, dictionary_stat)
-
+        # Список пар слов преобразуется в словарь
+        # Ключ - пара слов, значение - сколько раз встречалась эта пара
+        pairs = Counter(get_bigrams(namespace.dir, namespace.lc))
         # Запись в файл созданной модели
-        json.dump(dictionary_stat, model)
+        json.dump(pairs, model_f)

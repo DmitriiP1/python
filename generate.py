@@ -3,7 +3,7 @@
 # Павлов Дмитрий
 # МФТИ 2018
 # Ревью №1
-# Версия №0.1.0
+# Версия №0.1.2
 
 import argparse
 import random
@@ -39,7 +39,7 @@ parser.add_argument('--output',
 namespace = parser.parse_args()
 
 
-def find_next_word(current_word, dictionary_stat):
+def find_next_word(current_word, pairs):
     # Функция на основе модели выдает слово,
     # которое наиболее подходит для данного
 
@@ -54,11 +54,12 @@ def find_next_word(current_word, dictionary_stat):
     candidats = []
 
     # Перебираем ключи в словаре, ищем кандидатов и записываем статистику
-    for key in dictionary_stat:
+    for key in pairs:
         # Проверка, если первое слово в словосочетанни = данному,
         # то это словосочетание - кандидат
         if key[0] == current_word:
-            candidats.append(key)
+            tmp = [key * pairs[key]]
+            candidats.extend(tmp)
 
     # Если кандидаты не найдены, то генерация завершается
     if len(candidats) == 0:
@@ -68,7 +69,7 @@ def find_next_word(current_word, dictionary_stat):
     return word
 
 
-def generate(len_text, seed, dictionary_stat):
+def generate(len_text, seed, pairs):
     # Функция, генерирующая текст
 
     # len_text - максимальная длина генерируемого текста
@@ -82,13 +83,13 @@ def generate(len_text, seed, dictionary_stat):
     word = ''
     # Если не задано первое слово, то выберем рандомное из списка
     if seed is None:
-        word = (random.choice(list(dictionary_stat.keys())))[0]
+        word = (random.choice(list(pairs.keys())))[0]
     # Если первоначальное слово задано, то строим текст начиная с него
     else:
         # В словаре нет seed
         flag = True
         # Ищем есть ли seed среди ключей в словаре
-        for key in dictionary_stat:
+        for key in pairs:
             if key[0] == seed:
                 word = seed
                 # Нашли
@@ -101,7 +102,7 @@ def generate(len_text, seed, dictionary_stat):
     for i in range(len_text):
         text.append(word)
         # Определяем подходящее слово
-        word = find_next_word(word, dictionary_stat)
+        word = find_next_word(word, pairs)
         # Если подходящего слова нет, значит алгоритм зашел в тупик
         if word is None or word == PAIR_FOR_LAST_WORD:
             return ' '.join(text)
@@ -110,18 +111,18 @@ def generate(len_text, seed, dictionary_stat):
 
 if __name__ == '__main__':
     # Словарь со статистикой
-    dictionary_tmp = {}
-    dictionary_stat = {}
+    pairs_tmp = {}
+    pairs = {}
     with open(namespace.model, 'r') as file:
         # Открываем результаты обработки текстов,
         # Заносим эти данные в словарь
-        dictionary_tmp = json.load(file)
+        pairs_tmp = json.load(file)
 
-    for key in dictionary_tmp:
-        dictionary_stat[tuple(key.split())] = dictionary_tmp[key]
+    for key in pairs_tmp:
+        pairs[tuple(key.split())] = pairs_tmp[key]
 
     # Генерируем текст
-    text = generate(namespace.length, namespace.seed, dictionary_stat)
+    text = generate(namespace.length, namespace.seed, pairs)
     # Если указано в какой файл записать текст, то запишем его туда
     if namespace.output is not None:
         # Указанный файл
