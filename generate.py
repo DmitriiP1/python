@@ -1,9 +1,11 @@
-# coding: utf-8
-# Генератор текстов
-# Павлов Дмитрий
-# МФТИ 2018
-# Ревью №1
-# Версия №0.1.2
+"""
+coding: utf-8
+Генератор текстов
+Павлов Дмитрий
+МФТИ 2018
+Ревью №1
+Версия №0.1.3
+"""
 
 import argparse
 import random
@@ -35,8 +37,6 @@ parser.add_argument('--seed',
 parser.add_argument('--output',
                     help='Файл, в который будет записан '
                          'сгенерированный текст.')
-
-namespace = parser.parse_args()
 
 
 def find_next_word(current_word, pairs):
@@ -110,6 +110,8 @@ def generate(len_text, seed, pairs):
 
 
 if __name__ == '__main__':
+    # Парсинг аргументов
+    namespace = parser.parse_args()
     # Словарь со статистикой
     pairs_tmp = {}
     pairs = {}
@@ -129,7 +131,7 @@ if __name__ == '__main__':
         with open(namespace.output, 'w') as file:
             # Запись в файл
             file.write(text)
-            file.close()
+
     # Если не указано в какой файл записать текст, то выведем его
     else:
         print(text)

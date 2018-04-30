@@ -1,9 +1,11 @@
-# coding: utf-8
-# Создание модели по набору текстов
-# Павлов Дмитрий
-# МФТИ 2018
-# Ревью №1
-# Версия №0.1.2
+"""
+coding: utf-8
+Создание модели по набору текстов
+Павлов Дмитрий
+МФТИ 2018
+Ревью №1
+Версия №0.1.3
+"""
 
 import re
 import os
@@ -35,9 +37,6 @@ parser.add_argument('--lc',
                     help='Привести тексты к нижнему регистру.',
                     action='store_const',
                     const=True)
-
-
-namespace = parser.parse_args()
 
 
 def train(file_for_train, lowercase, bigrams, used):
@@ -114,6 +113,8 @@ def get_bigrams(directory, lowercase):
 
 
 if __name__ == '__main__':
+    # Парсинг аргументов
+    namespace = parser.parse_args()
 
     open(namespace.model, 'w').close()
 
