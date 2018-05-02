@@ -51,7 +51,6 @@ def train(file_for_train, lowercase, bigrams, used):
 
     # Файл с текстом
     with open(file_for_train, 'r', encoding='utf-8') as file_for_train:
-
         # Достаем часть текста
         for line in file_for_train:
             # Разрешенные символы
