@@ -120,7 +120,6 @@ if __name__ == '__main__':
 
     # Файл для записи модели
     with open(namespace.model, 'a+', encoding='utf-8') as model_f:
-
         # Список пар слов преобразуется в словарь
         # Ключ - пара слов, значение - сколько раз встречалась эта пара
         pairs = Counter(get_bigrams(namespace.dir, namespace.lc))
