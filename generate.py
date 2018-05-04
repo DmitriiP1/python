@@ -76,6 +76,7 @@ def generate(len_text, seed, pairs):
 
    param: len_text - максимальная длина генерируемого текста
    param: dictionary_stat - словарь с моделью
+   param: seed - слово с которого начинается текст
 
    Возвращает сгенерированный текст"""
     # ------------------------------------------------ #
@@ -83,7 +84,6 @@ def generate(len_text, seed, pairs):
     # Список для текста, который выдаст функция
     text = []
     word = ''
-    print(seed, list(pairs.keys()))
     # Если не задано первое слово, то выберем рандомное из списка
     if seed is None:
         word = (random.choice(list(pairs.keys())))[0]
@@ -132,7 +132,6 @@ if __name__ == '__main__':
         # Указанный файл
         with open(namespace.output, 'w') as file:
             # Запись в файл
-            print(text)
             file.write(text)
 
     # Если не указано в какой файл записать текст, то выведем его
