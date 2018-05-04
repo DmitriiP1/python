@@ -11,9 +11,6 @@ import argparse
 import random
 import json
 
-# Глобальная константа
-PAIR_FOR_LAST_WORD = '$'
-
 # Командный интерфейс
 parser = argparse.ArgumentParser(description='Генератор текстов. Если модель '
                                              'не создана, то запустить '
@@ -46,11 +43,12 @@ def find_next_word(current_word, pairs):
     param: current_word - данное слово
     param: dictionary_stat - словарь с моделью
 
-    Возвращает слово, которое будет продоллжением данного"""
+    Возвращает слово, которое будет продоллжением данного или None,
+     если нет продолжения"""
     # --------------------------------------------------- #
 
     # Кандидаты на искомое слово,
-    # Список в виде словосочетаний(=ключам в словаре),
+    # Список, хранящий словосочетания
     candidats = []
 
     # Перебираем ключи в словаре, ищем кандидатов и записываем статистику
@@ -65,8 +63,10 @@ def find_next_word(current_word, pairs):
     if len(candidats) == 0:
         # Флаг, что алгоритм зашел в тупик
         return None
-    word = (random.choice(candidats))[1]
-    return word
+    word = random.choice(candidats)
+    if len(word) == 1:
+        return None
+    return word[1]
 
 
 def generate(len_text, seed, pairs):
@@ -104,7 +104,7 @@ def generate(len_text, seed, pairs):
         # Определяем подходящее слово
         word = find_next_word(word, pairs)
         # Если подходящего слова нет, значит алгоритм зашел в тупик
-        if word is None or word == PAIR_FOR_LAST_WORD:
+        if word is None:
             return ' '.join(text)
     return ' '.join(text)
 

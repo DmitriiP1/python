@@ -13,9 +13,6 @@ import argparse
 import json
 from collections import Counter
 
-# Глобальная константа
-PAIR_FOR_LAST_WORD = '$'
-
 # Командный интерфейс
 parser = argparse.ArgumentParser(description='Создание модели. Модель нужна '
                                              'для генерации текстов '
@@ -96,7 +93,7 @@ def get_bigrams(directory, lowercase):
                         # то не ставим ему в пару специальный символ,
                         # отвечающий за слова с непонятным продолжением
                         if line and line[-1] not in used:
-                            pair = line[-1] + ' ' + PAIR_FOR_LAST_WORD
+                            pair = line[-1]
                             bigrams.append(pair)
     return bigrams
 
@@ -112,5 +109,6 @@ if __name__ == '__main__':
         # Ключ - пара слов, значение - сколько раз встречалась эта пара
         bigrams = Counter(get_bigrams(namespace.dir, namespace.lc))
 
+        print(bigrams)
         # Запись в файл созданной модели
         json.dump(bigrams, model_f)
