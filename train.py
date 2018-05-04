@@ -112,6 +112,5 @@ if __name__ == '__main__':
         # Ключ - пара слов, значение - сколько раз встречалась эта пара
         bigrams = Counter(get_bigrams(namespace.dir, namespace.lc))
 
-        print(bigrams)
         # Запись в файл созданной модели
         json.dump(bigrams, model_f)
