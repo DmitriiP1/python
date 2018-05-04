@@ -64,6 +64,7 @@ def find_next_word(current_word, pairs):
         # Флаг, что алгоритм зашел в тупик
         return None
     word = random.choice(candidats)
+    # Если у слова нет продолжения, то у него нет пары
     if len(word) == 1:
         return None
     return word[1]
