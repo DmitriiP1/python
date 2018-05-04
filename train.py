@@ -47,11 +47,12 @@ def get_bigrams(directory, lowercase):
     param: lowercase - переменная, отвечающая за приведение слов, сохраняемых
         в модели, к нижнему регистру
 
-    Возвращает список, состоящий из строк '<слово 1>' '<слово 2>' """
+    Возвращает список, состоящий из '<слово 1>' '<слово 2>' """
     # ---------------------------------------------------------------- #
 
     # Список пар
     bigrams = []
+
     # Слова которые есть в bigrams
     used = []
 
@@ -67,6 +68,7 @@ def get_bigrams(directory, lowercase):
             if file_extension == '.txt':
                 # Обрабатываемый файл
                 file = str(os.path.normpath(path))
+
                 # Код ниже дополняет модель по данным из текущего текста
                 with open(file, 'r', encoding='utf-8') as file_for_train:
 
@@ -103,13 +105,15 @@ if __name__ == '__main__':
     # Парсинг аргументов
     namespace = parser.parse_args()
 
-    open(namespace.model, 'w').close()
-
     # Файл для записи модели
     with open(namespace.model, 'a+', encoding='utf-8') as model_f:
+        # Отчистим файл для записи новой модели
+        model_f.truncate(0)
 
         # Список пар слов преобразуется в словарь
         # Ключ - пара слов, значение - сколько раз встречалась эта пара
         bigrams = Counter(get_bigrams(namespace.dir, namespace.lc))
+
+        print(bigrams)
         # Запись в файл созданной модели
         json.dump(bigrams, model_f)
