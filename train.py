@@ -36,15 +36,56 @@ parser.add_argument('--lc',
                     const=True)
 
 
+def train(file_for_train, lowercase, bigrams, used):
+    """ Функция, дополняющая модель по данным из текста
+   Возвращает модель, дополненную новыми данными
+
+   param: file_for_train -файл с текстом по которому будет обучаться программа
+   param: lowercase - переменная, отвечающая за приведение слов, сохраняемых
+   в модели, к нижнему регистру
+   param: dictionary_stat - словарь с моделью
+   param: bigrams - cписок пар
+   param: used - список слов, которые есть в bigrams"""
+    # ------------------------------------------------------------------- #
+
+    with open(file_for_train, 'r', encoding='utf-8') as file_for_train:
+        # Достаем часть текста
+        for line in file_for_train:
+            # Разрешенные символы
+            reg = re.compile('[^A-Za-zА-Яа-яё]')
+            # Удаляем лишние символы (оставляем нужные)
+            line = reg.sub(' ', line)
+
+            # Если необходимо убрать заглавные буквы
+            if lowercase:
+                line = line.lower()
+
+            line = line.split()
+            # Проходим по куску текста
+            for i in range(len(line) - 1):
+                # 2 подряд идущие слова объединяем
+                # в словосочетание, записываем их в словарь
+                pair = line[i] + ' ' + line[i + 1]
+                bigrams.append(pair)
+                used.append(line[i])
+
+            # Если слово последнее, но встречалось раньше,
+            # то оно не особенное
+            if line and line[-1] not in used:
+                pair = line[-1]
+                bigrams.append(pair)
+    return bigrams
+
+
 def get_bigrams(directory, lowercase):
     """ Поиск .txt файлов в директории
-    Возвращает список пар слов
+   Возвращает список пар слов
 
-    param: directory - директория с файлами для обучения
-    param: lowercase - переменная, отвечающая за приведение слов, сохраняемых
-        в модели, к нижнему регистру
+   param: directory - директория с файлами для обучения
+   param: lowercase - переменная, отвечающая за приведение слов, сохраняемых
+       в модели, к нижнему регистру
 
-    Возвращает список, состоящий из '<слово 1>' '<слово 2>' """
+   Возвращает список, состоящий из '<слово 1>' '<слово 2>' """
     # ---------------------------------------------------------------- #
 
     # Список пар
@@ -61,40 +102,13 @@ def get_bigrams(directory, lowercase):
 
             # Разделяем имя файла на 2 части: заголовок и формат
             filename, file_extension = os.path.splitext(path)
+
             # Если .тхт, то обрабатываем его
             if file_extension == '.txt':
                 # Обрабатываемый файл
                 file = str(os.path.normpath(path))
-
-                # Код ниже дополняет модель по данным из текущего текста
-                with open(file, 'r', encoding='utf-8') as file_for_train:
-
-                    # Достаем часть текста
-                    for line in file_for_train:
-                        # Разрешенные символы
-                        reg = re.compile('[^A-Za-zА-Яа-яё]')
-                        # Удаляем лишние символы (оставляем нужные)
-                        line = reg.sub(' ', line)
-
-                        # Если необходимо убрать заглавные буквы
-                        if lowercase:
-                            line = line.lower()
-
-                        line = line.split()
-                        # Проходим по куску текста
-                        for i in range(len(line) - 1):
-                            # 2 подряд идущие слова объединяем
-                            # в словосочетание, записываем их в словарь
-                            pair = line[i] + ' ' + line[i + 1]
-                            bigrams.append(pair)
-                            used.append(line[i])
-
-                        # Если слово последнее, но встречалось раньше,
-                        # то не ставим ему в пару специальный символ,
-                        # отвечающий за слова с непонятным продолжением
-                        if line and line[-1] not in used:
-                            pair = line[-1]
-                            bigrams.append(pair)
+                # Обновление модели по данным из текущего файла
+                bigrams = train(file, lowercase, bigrams, used)
     return bigrams
 
 
@@ -109,6 +123,5 @@ if __name__ == '__main__':
         # Ключ - пара слов, значение - сколько раз встречалась эта пара
         bigrams = Counter(get_bigrams(namespace.dir, namespace.lc))
 
-        print(bigrams)
         # Запись в файл созданной модели
         json.dump(bigrams, model_f)

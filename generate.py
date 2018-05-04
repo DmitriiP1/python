@@ -10,6 +10,7 @@ coding: utf-8
 import argparse
 import random
 import json
+from functools import reduce
 
 # Командный интерфейс
 parser = argparse.ArgumentParser(description='Генератор текстов. Если модель '
@@ -38,13 +39,13 @@ parser.add_argument('--output',
 
 def find_next_word(current_word, pairs):
     """Функция на основе модели выдает слово,
-    которое наиболее подходит для данного
+   которое наиболее подходит для данного
 
-    param: current_word - данное слово
-    param: dictionary_stat - словарь с моделью
+   param: current_word - данное слово
+   param: dictionary_stat - словарь с моделью
 
-    Возвращает слово, которое будет продоллжением данного или None,
-     если нет продолжения"""
+   Возвращает слово, которое будет продоллжением данного или None,
+    если нет продолжения"""
     # --------------------------------------------------- #
 
     # Кандидаты на искомое слово,
@@ -63,8 +64,8 @@ def find_next_word(current_word, pairs):
     if len(candidats) == 0:
         # Флаг, что алгоритм зашел в тупик
         return None
+
     word = random.choice(candidats)
-    # Если у слова нет продолжения, то у него нет пары
     if len(word) == 1:
         return None
     return word[1]
@@ -73,35 +74,34 @@ def find_next_word(current_word, pairs):
 def generate(len_text, seed, pairs):
     """Функция, генерирующая текст
 
-    param: len_text - максимальная длина генерируемого текста
-    param: dictionary_stat - словарь с моделью
+   param: len_text - максимальная длина генерируемого текста
+   param: dictionary_stat - словарь с моделью
 
-    Возвращает сгенерированный текст"""
+   Возвращает сгенерированный текст"""
     # ------------------------------------------------ #
 
     # Список для текста, который выдаст функция
     text = []
     word = ''
+    print(seed, list(pairs.keys()))
     # Если не задано первое слово, то выберем рандомное из списка
     if seed is None:
         word = (random.choice(list(pairs.keys())))[0]
     # Если первоначальное слово задано, то строим текст начиная с него
     else:
+        word = list(filter(lambda x: x[0] if x[0] == seed else None,
+                           pairs.keys()))[0][1]
         # В словаре нет seed
-        flag = True
-        # Ищем есть ли seed среди ключей в словаре
-        for key in pairs:
-            if key[0] == seed:
-                word = seed
-                # Нашли
-                flag = False
-        if flag:
+        if word is None:
             # Если не нашли то исключение
             raise SystemError(256)
-
+        text.append(seed)
+        len_text -= 1
     # В цикле для i-го слова буем искать i + 1 при помощи полученой статистики
+
     for i in range(len_text):
         text.append(word)
+
         # Определяем подходящее слово
         word = find_next_word(word, pairs)
         # Если подходящего слова нет, значит алгоритм зашел в тупик
@@ -132,6 +132,7 @@ if __name__ == '__main__':
         # Указанный файл
         with open(namespace.output, 'w') as file:
             # Запись в файл
+            print(text)
             file.write(text)
 
     # Если не указано в какой файл записать текст, то выведем его
