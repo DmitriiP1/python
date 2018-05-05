@@ -76,7 +76,6 @@ def generate(len_text, seed, pairs):
 
    param: len_text - максимальная длина генерируемого текста
    param: dictionary_stat - словарь с моделью
-   param: seed - слово с которого начинается текст
 
    Возвращает сгенерированный текст"""
     # ------------------------------------------------ #
@@ -90,7 +89,11 @@ def generate(len_text, seed, pairs):
     # Если первоначальное слово задано, то строим текст начиная с него
     else:
         word = list(filter(lambda x: x[0] if x[0] == seed else None,
-                           pairs.keys()))[0][1]
+                           pairs.keys()))
+        if (len(word) != 0):
+            word = word[0][1]
+        else:
+            word = None
         # В словаре нет seed
         if word is None:
             # Если не нашли то исключение
