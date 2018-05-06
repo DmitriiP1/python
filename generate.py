@@ -68,7 +68,6 @@ def find_next_word(current_word, model):
 
     # Вибираем наиболее подходящую пару из кандидатов
     word = random.choice(candidats)
-
     # Если пара такая, что после current_word есть слово,
     # то оно будет продолжением
     if len(word) > 1:
@@ -138,10 +137,9 @@ if __name__ == '__main__':
         # Заносим эти данные в словарь
         model_tmp = json.load(file)
 
-    # Преобразуем словарь к виду "[слово, слово] : статистика"
+    # Преобразуем словарь к виду "(слово, слово) : статистика"
     for key in model_tmp:
         model[tuple(key.split())] = model_tmp[key]
-
     # Генерируем текст
     text = generate(namespace.length, namespace.seed, model)
 
@@ -151,7 +149,6 @@ if __name__ == '__main__':
         with open(namespace.output, 'w') as file:
             # Запись в файл
             file.write(text)
-
     # Если не указано в какой файл записать текст, то выведем его
     else:
         print(text)

@@ -37,7 +37,7 @@ parser.add_argument('--lc',
                     const=True)
 
 
-def train(file_for_train, lowercase, model_dict, used):
+def train(file_for_train, lowercase, model_dict):
     """ Функция, дополняющая модель по данным из текста
     Возвращает модель, дополненную новыми данными
 
@@ -62,30 +62,17 @@ def train(file_for_train, lowercase, model_dict, used):
             # Разобьем кусок текста на слова
             line = line.split()
 
-            # Список с новыми словосочетаниями
-            new_pairs = []
-
-            # Проходим по куску текста
-            for current_word in range(len(line) - 1):
-                # 2 подряд идущие слова объединяем
-                # в словосочетание, записываем их в словарь
-                pair = line[current_word] + ' ' + line[current_word + 1]
-                new_pairs.append(pair)
-                used.append(line[current_word])
-
-            # Если слово последнее, и не встречалось раньше, то пара
-            # выглядит как (слово, None) то есть состоит из одного элемента
-            if line and line[-1] not in used:
-                pair = line[-1]
-                new_pairs.append(pair)
-
-            # превращаем new_pairs в словарь
-            new_pairs = Counter(new_pairs)
-
+            line = Counter(list(zip(line[:-1], line[1:])))
+            line1 = Counter({})
+            # Преобразовываем словарь к виду, удобному для записи
+            for i in line:
+                if i[1]:
+                    line1[str(i[0]) + ' ' + str(i[1])] = line[i]
+                else:
+                    line1[str(i[0])] = line[i]
             # Слияние словаря с моделью и нового словаря
-            for key in new_pairs:
-                model_dict[key] += new_pairs[key]
-
+            for key in line1:
+                model_dict[key] += line1[key]
     return model_dict
 
 
@@ -103,9 +90,6 @@ def get_model(directory, lowercase):
     # Словарь с моделью
     model_dict = defaultdict(int)
 
-    # Слова которые есть в model_dict
-    used = []
-
     # Поиск файлов в директории
     for top, dirs, files in os.walk(directory):
         for i in files:
@@ -121,7 +105,7 @@ def get_model(directory, lowercase):
                 file = str(os.path.normpath(path))
 
                 # Обновление модели по данным из текущего файла
-                model_dict = train(file, lowercase, model_dict, used)
+                model_dict = train(file, lowercase, model_dict)
     return model_dict
 
 
