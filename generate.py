@@ -36,12 +36,13 @@ parser.add_argument('--output',
                          'сгенерированный текст.')
 
 
-def find_next_word(current_word, pairs):
+def find_next_word(current_word, model):
     """Функция на основе модели выдает слово,
     которое наиболее подходит для данного
 
     param: current_word - данное слово
-    param: pairs - словарь с моделью
+    param: model - словарь с моделью в виде
+    [слово, слово]: сколько раз встретилось
 
     Возвращает слово, которое будет продоллжением данного или None,
     если нет продолжения"""
@@ -53,11 +54,11 @@ def find_next_word(current_word, pairs):
 
     # Перебираем ключи в словаре, ищем словосочетания,
     # у которых первый элемент = current_word
-    for key in pairs:
+    for key in model:
         # Проверка, если первое слово в словосочетанни = current_word,
         # то это словосочетание - кандидат
         if key[0] == current_word:
-            tmp = [key * pairs[key]]
+            tmp = [key * model[key]]
             candidats.extend(tmp)
 
     # Если кандидаты не найдены, то генерация завершается
@@ -78,7 +79,7 @@ def find_next_word(current_word, pairs):
         return None
 
 
-def generate(len_text, seed, pairs):
+def generate(len_text, seed, model):
     """Функция, генерирующая текст
 
    param: len_text - максимальная длина генерируемого текста
@@ -95,7 +96,7 @@ def generate(len_text, seed, pairs):
     if seed is not None:
         # Будет список из пар, у которых первый элемент = seed
         word = list(filter(lambda x: x[0] if x[0] == seed else None,
-                           pairs.keys()))
+                           model.keys()))
 
         # Проверка, что слово нашлось
         if (len(word) > 0):
@@ -108,14 +109,14 @@ def generate(len_text, seed, pairs):
     else:
         # в pairs ключ - пара (слово, слово), выбираем рандоменую пару,
         # а в ней первый элемент
-        word = (random.choice(list(pairs.keys())))[0]
+        word = (random.choice(list(model.keys())))[0]
 
     # В цикле для i-го слова буем искать i + 1 при помощи полученной статистики
     for i in range(len_text):
         text.append(word)
 
         # Определяем подходящее слово
-        word = find_next_word(word, pairs)
+        word = find_next_word(word, model)
 
         # Если подходящего слова нет, значит алгоритм зашел в тупик
         if word is None:
@@ -129,21 +130,21 @@ if __name__ == '__main__':
     namespace = parser.parse_args()
 
     # Словарь со статистикой
-    pairs_tmp = {}
-    pairs = {}
+    model_tmp = {}
+    model = {}
 
     # Получаем статистику из файла
     with open(namespace.model, 'r') as file:
         # Открываем результаты обработки текстов,
         # Заносим эти данные в словарь
-        pairs_tmp = json.load(file)
+        model_tmp = json.load(file)
 
-    # Преобразуем словарь к виду "(слово, слово) : статистика"
-    for key in pairs_tmp:
-        pairs[tuple(key.split())] = pairs_tmp[key]
+    # Преобразуем словарь к виду "[слово, слово] : статистика"
+    for key in model_tmp:
+        model[tuple(key.split())] = model_tmp[key]
 
     # Генерируем текст
-    text = generate(namespace.length, namespace.seed, pairs)
+    text = generate(namespace.length, namespace.seed, model)
 
     # Если указано в какой файл записать текст, то запишем его туда
     if namespace.output is not None:

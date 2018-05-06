@@ -11,6 +11,7 @@ import re
 import os
 import argparse
 import json
+from collections import defaultdict
 from collections import Counter
 
 # Командный интерфейс
@@ -43,8 +44,8 @@ def train(file_for_train, lowercase, model_dict, used):
     param: file_for_train -файл с текстом по которому будет обучаться программа
     param: lowercase - переменная, отвечающая за приведение слов, сохраняемых
     в модели, к нижнему регистру
-    param: model_dict - cписок пар
-    param: used - список слов, которые есть в bigrams"""
+    param: model_dict - словарь, ключ - пары слов, значение - статистика
+    param: used - список слов, которые есть в model_dict"""
 
     with open(file_for_train, 'r', encoding='utf-8') as file_for_train:
         # Достаем часть текста
@@ -58,20 +59,33 @@ def train(file_for_train, lowercase, model_dict, used):
             if lowercase:
                 line = line.lower()
 
+            # Разобьем кусок текста на слова
             line = line.split()
+
+            # Список с новыми словосочетаниями
+            new_pairs = []
+
             # Проходим по куску текста
-            for i in range(len(line) - 1):
+            for current_word in range(len(line) - 1):
                 # 2 подряд идущие слова объединяем
                 # в словосочетание, записываем их в словарь
-                pair = line[i] + ' ' + line[i + 1]
-                model_dict.append(pair)
-                used.append(line[i])
+                pair = line[current_word] + ' ' + line[current_word + 1]
+                new_pairs.append(pair)
+                used.append(line[current_word])
 
-            # Если слово последнее, но встречалось раньше,
-            # то оно не особенное
+            # Если слово последнее, и не встречалось раньше, то пара
+            # выглядит как (слово, None) то есть состоит из одного элемента
             if line and line[-1] not in used:
                 pair = line[-1]
-                model_dict.append(pair)
+                new_pairs.append(pair)
+
+            # превращаем new_pairs в словарь
+            new_pairs = Counter(new_pairs)
+
+            # Слияние словаря с моделью и нового словаря
+            for key in new_pairs:
+                model_dict[key] += new_pairs[key]
+
     return model_dict
 
 
@@ -83,10 +97,11 @@ def get_model(directory, lowercase):
     param: lowercase - переменная, отвечающая за приведение слов, сохраняемых
        в модели, к нижнему регистру
 
-    Возвращает список, состоящий из '<слово 1>' '<слово 2>' """
+    Возвращает словарь: ключ - словосочетание, записанное через пробел,
+    значение - сколько раз оно встретилось в текстах"""
 
-    # Список пар
-    model_dict = []
+    # Словарь с моделью
+    model_dict = defaultdict(int)
 
     # Слова которые есть в model_dict
     used = []
@@ -119,7 +134,6 @@ if __name__ == '__main__':
 
         # Список пар слов преобразуется в словарь
         # Ключ - пара слов, значение - сколько раз встречалась эта пара
-        model_dict = Counter(get_model(namespace.dir, namespace.lc))
-
-        # Запись в файл созданной модели
+        model_dict = get_model(namespace.dir, namespace.lc)
+        # Запись в файл словаря со статистикой в модель
         json.dump(model_dict, model_file)
