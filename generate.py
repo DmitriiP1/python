@@ -94,7 +94,7 @@ def generate(len_text, seed, model):
 
     # Если первоначальное слово задано, то строим текст начиная с него
     if seed is not None:
-        # Будет список из пар, у которых первый элемент = seed
+        # Будет список из пар, у которых первый элемент=seed или пустой список
         word = list(filter(lambda x: x[0] if x[0] == seed else None,
                            model.keys()))
 
