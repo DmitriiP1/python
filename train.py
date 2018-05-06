@@ -43,7 +43,6 @@ def train(file_for_train, lowercase, bigrams, used):
    param: file_for_train -файл с текстом по которому будет обучаться программа
    param: lowercase - переменная, отвечающая за приведение слов, сохраняемых
    в модели, к нижнему регистру
-   param: dictionary_stat - словарь с моделью
    param: bigrams - cписок пар
    param: used - список слов, которые есть в bigrams"""
     # ------------------------------------------------------------------- #
