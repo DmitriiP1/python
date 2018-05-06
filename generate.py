@@ -85,21 +85,24 @@ def generate(len_text, seed, pairs):
     word = ''
     # Если не задано первое слово, то выберем рандомное из списка
     if seed is None:
+        # в pairs ключ - пара (слово, слово), выбираем рандоменую пару,
+        # а в ней первый элемент
         word = (random.choice(list(pairs.keys())))[0]
     # Если первоначальное слово задано, то строим текст начиная с него
     else:
+        # Будет список из пар, у которых первый элемент = seed
         word = list(filter(lambda x: x[0] if x[0] == seed else None,
                            pairs.keys()))
-        if (len(word) != 0):
-            word = word[0][1]
+        # Проверка, что слово нашлось
+        if (len(word) > 0):
+            # Получили список из пар, у которых первый элемент = seed
+            word = word[0][0]
         else:
             word = None
         # В словаре нет seed
         if word is None:
             # Если не нашли то исключение
             raise SystemError(256)
-        text.append(seed)
-        len_text -= 1
     # В цикле для i-го слова буем искать i + 1 при помощи полученой статистики
 
     for i in range(len_text):
