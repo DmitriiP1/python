@@ -73,7 +73,7 @@ def find_next_word(current_word, model):
     # то оно будет продолжением
     if len(word) > 1:
         return word[1]
-    # Если пара такая, что после current_word нет слово,
+    # Если пара такая, что после current_word нет слова,
     # то алгоритм зашел в тупик
     else:
         return None
