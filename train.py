@@ -61,8 +61,10 @@ def train(file_for_train, lowercase, model_dict):
 
             # Разобьем кусок текста на слова
             line = line.split()
+            line.append(None)
 
             line = Counter(list(zip(line[:-1], line[1:])))
+
             line1 = Counter({})
             # Преобразовываем словарь к виду, удобному для записи
             for i in line:

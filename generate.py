@@ -10,6 +10,7 @@ coding: utf-8
 import argparse
 import random
 import json
+from functools import reduce
 
 # Командный интерфейс
 parser = argparse.ArgumentParser(description='Генератор текстов. Если модель'
@@ -48,26 +49,27 @@ def find_next_word(current_word, model):
     если нет продолжения"""
 
     # Кандидаты на искомое слово,
-    # Список, хранящий словосочетания, каждое словосочетание будет встречаться
-    # в списке столько раз, сколько оно встречалось в прочитаных текстах
-    candidats = []
+    # candidats = []
 
     # Перебираем ключи в словаре, ищем словосочетания,
     # у которых первый элемент = current_word
-    for key in model:
-        # Проверка, если первое слово в словосочетанни = current_word,
-        # то это словосочетание - кандидат
-        if key[0] == current_word:
-            tmp = [key * model[key]]
-            candidats.extend(tmp)
+    candidats = list(filter(lambda x: x
+                            if x[0] == current_word else None, model))
 
     # Если кандидаты не найдены, то генерация завершается
     if len(candidats) == 0:
         # Флаг, что алгоритм зашел в тупик
         return None
 
+    # Список, хранящий словосочетания, каждое словосочетание будет встречаться
+    # в списке столько раз, сколько оно встречалось в прочитаных текстах
+    candidats_new = []
+    for i in candidats:
+        candidats_new.append([i] * model[i])
+
     # Вибираем наиболее подходящую пару из кандидатов
-    word = random.choice(candidats)
+    word = random.choice(candidats_new[0])
+
     # Если пара такая, что после current_word есть слово,
     # то оно будет продолжением
     if len(word) > 1:
@@ -95,7 +97,6 @@ def generate(len_text, seed, model):
         # Будет список из пар, у которых первый элемент=seed или пустой список
         word = list(filter(lambda x: x[0] if x[0] == seed else None,
                            model.keys()))
-
         # Проверка, что слово нашлось
         if (len(word) > 0):
             # Получили список из пар, у которых первый элемент = seed
