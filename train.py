@@ -11,7 +11,6 @@ import re
 import os
 import argparse
 import json
-from collections import defaultdict
 from collections import Counter
 
 # Командный интерфейс
