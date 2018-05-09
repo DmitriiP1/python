@@ -4,7 +4,7 @@ coding: utf-8
 Павлов Дмитрий
 МФТИ 2018
 Ревью №1
-Версия №0.2.0
+Версия №0.2.1
 """
 
 import argparse
@@ -52,9 +52,10 @@ def find_next_word(current_word, model):
     # candidats = []
 
     # Перебираем ключи в словаре, ищем словосочетания,
-    # у которых первый элемент = current_word
+    # у которых первый элемент = current_word и есть продолжение
     candidats = list(filter(lambda x: x
-                            if x[0] == current_word else None, model))
+                            if x[0] == current_word and len(x) == 2 else None,
+                            model))
 
     # Если кандидаты не найдены, то генерация завершается
     if len(candidats) == 0:
@@ -95,7 +96,8 @@ def generate(len_text, seed, model):
     # Если первоначальное слово задано, то строим текст начиная с него
     if seed is not None:
         # Будет список из пар, у которых первый элемент=seed или пустой список
-        word = list(filter(lambda x: x[0] if x[0] == seed else None,
+        word = list(filter(lambda x:
+                           x[0] if x[0] == seed else None,
                            model.keys()))
         # Проверка, что слово нашлось
         if (len(word) > 0):

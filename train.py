@@ -4,7 +4,7 @@ coding: utf-8
 Павлов Дмитрий
 МФТИ 2018
 Ревью №1
-Версия №0.2.0
+Версия №0.2.1
 """
 
 import re
@@ -63,18 +63,13 @@ def train(file_for_train, lowercase, model_dict):
             line = line.split()
             line.append(None)
 
+            # Преобразуем список с биграммами в Counter - словарь со статиской
+            # текущего куска текста
             line = Counter(list(zip(line[:-1], line[1:])))
 
-            line1 = Counter({})
-            # Преобразовываем словарь к виду, удобному для записи
-            for i in line:
-                if i[1]:
-                    line1[str(i[0]) + ' ' + str(i[1])] = line[i]
-                else:
-                    line1[str(i[0])] = line[i]
-            # Слияние словаря с моделью и нового словаря
-            for key in line1:
-                model_dict[key] += line1[key]
+            # Объединение словаря со всей статистикой и словаря со статиской
+            # текущего куска текста
+            model_dict += line
     return model_dict
 
 
@@ -90,7 +85,7 @@ def get_model(directory, lowercase):
     значение - сколько раз оно встретилось в текстах"""
 
     # Словарь с моделью
-    model_dict = defaultdict(int)
+    model_dict = Counter({})
 
     # Поиск файлов в директории
     for top, dirs, files in os.walk(directory):
@@ -121,5 +116,14 @@ if __name__ == '__main__':
         # Список пар слов преобразуется в словарь
         # Ключ - пара слов, значение - сколько раз встречалась эта пара
         model_dict = get_model(namespace.dir, namespace.lc)
+
+        model_dict_write = Counter({})
+        # Преобразовываем словарь к виду, удобному для записи
+        for i in model_dict:
+            if i[1]:
+                model_dict_write[str(i[0]) + ' ' + str(i[1])] = model_dict[i]
+            else:
+                model_dict_write[str(i[0])] = model_dict[i]
+
         # Запись в файл словаря со статистикой в модель
-        json.dump(model_dict, model_file)
+        json.dump(model_dict_write, model_file)
