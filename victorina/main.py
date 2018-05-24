@@ -1,14 +1,13 @@
 from tkinter import *
 from tkinter import messagebox
-#from PIL import ImageTk,Image
 import random
-import pickle
-import codecs
+#import pickle
+#import codecs
 
 
 questions = []
 buf = []
-f = codecs.open("questions.txt", mode='r')
+f = open("questions.txt", mode='r')
 flag = False
 start = False
 for line in f:
@@ -34,12 +33,12 @@ f.close()
 root = Tk()
 root.title("Викторина")
 root.geometry('1000x400')
-root.resizable(False,False)
+
 i = 0
 score = 0
 
 '''
-questions = [["Что из перечисленного относится к несистематизированному типу мировоззрения?",
+questions = [["Что из перечисленного относится к несистематизированному типу мировоззрения?",ot
               "Мифологическое", "Научное","Религиозное","Философское"],
              ["Кто из философов утверждал: вода не может быть началом всего, так как она не беспредельна?",
               "Анаксимандр","Гераклит","Пифагор","Фалес"],
@@ -230,7 +229,6 @@ def mix_questions():
 
 mix_questions()
 
-
 def out_question():
     global i
     if i < len(questions):
@@ -252,5 +250,6 @@ def out_question():
         return
 
 out_question()
+
 
 root.mainloop()
