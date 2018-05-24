@@ -1,6 +1,35 @@
 from tkinter import *
 from tkinter import messagebox
+#from PIL import ImageTk,Image
 import random
+import pickle
+import codecs
+
+
+questions = []
+buf = []
+f = codecs.open("questions.txt", mode='r')
+flag = False
+start = False
+for line in f:
+    if line[-1] == '\n':
+        line = line[:-1]
+    if flag:
+        buf.append(line)
+    if line[-1] == '$':
+        line = line[:-1]
+        if len(buf) > 5:
+            raise TypeError
+        start = True
+        buf.clear()
+        buf.append(line)
+        flag = True
+    if len(buf) == 5:
+        questions.append(buf.copy())
+        buf.clear()
+        flag = False
+f.close()
+
 
 root = Tk()
 root.title("Викторина")
@@ -9,6 +38,7 @@ root.resizable(False,False)
 i = 0
 score = 0
 
+'''
 questions = [["Что из перечисленного относится к несистематизированному типу мировоззрения?",
               "Мифологическое", "Научное","Религиозное","Философское"],
              ["Кто из философов утверждал: вода не может быть началом всего, так как она не беспредельна?",
@@ -53,7 +83,7 @@ questions = [["Что из перечисленного относится к н
               "все утверждения характерны","являлись платными учителями мудрости","Преподавали риторику","Считали, что истины не существует, есть только знания"],
              ["Кто из философов считал, что вещи следуют из идей?",
               "Платон","Сократ","Аристотель","Фалес"]]
-
+'''
 
 def question_1(quest):
     question = Label(root, text=quest[0], font=("Consolas", 13), anchor=CENTER)
