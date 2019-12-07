@@ -1,5 +1,5 @@
 # python
 
-project - папка с проектом
+project - folder with project
 
-test - пример как выглядит тестирующая программа
+test - tests for project
